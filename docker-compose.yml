@@ -25,7 +25,6 @@ services:
     cap_add:
       - IPC_LOCK
     command:
-      - "boundary"
       - "database"
       - "init"
       - "-config"
