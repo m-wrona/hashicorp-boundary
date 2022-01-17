@@ -1,0 +1,74 @@
+version: "3"
+services:
+
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_HOST_AUTH_METHOD=md5
+      - POSTGRES_INITDB_ARGS=--auth-host=md5
+      - listen_addresses='*'
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+
+  boundary-db-init:
+    image: hashicorp/boundary
+    cap_add:
+      - IPC_LOCK
+    command:
+      - "boundary"
+      - "database"
+      - "init"
+      - "-config"
+      - "/boundary/config.hcl"
+    environment:
+      - BOUNDARY_POSTGRES_URL=postgresql://boundary_admin:pass@postgres:5432/boundary?sslmode=disable
+    depends_on:
+      postgres:
+          condition: service_healthy
+    volumes:
+      - ./boundary:/boundary/
+
+  boundary:
+    image: hashicorp/boundary
+    cap_add:
+      - IPC_LOCK
+    command: 
+      - "server"
+      - "-config"
+      - "/boundary/config.hcl"
+    volumes:
+      - ./boundary:/boundary/
+    ports:
+      - 9200:9200
+      - 9201:9201
+      - 9202:9202
+    environment:
+      - BOUNDARY_POSTGRES_URL=postgresql://boundary_admin:pass@postgres:5432/boundary?sslmode=disable
+      - HOSTNAME=boundary
+    depends_on:
+      boundary-db-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-O-", "http://boundary:9200"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+
+  wait:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      postgres:
+          condition: service_healthy
+      boundary:
+        condition: service_healthy
+    command: postgres:5432 boundary:9200
