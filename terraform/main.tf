@@ -1,39 +1,3 @@
-provider "boundary" {
-  addr                            = "http://127.0.0.1:9200"
-  auth_method_id                  = "ampw_1234567890"
-  password_auth_method_login_name = "admin"
-  password_auth_method_password   = "password"
-}
-
-variable "users" {
-  type    = set(string)
-  default = [
-    "Jim",
-    "Mike",
-    "Todd",
-    "Jeff",
-    "Randy",
-    "Susmitha"
-  ]
-}
-
-variable "readonly_users" {
-  type    = set(string)
-  default = [
-    "Chris",
-    "Pete",
-    "Justin"
-  ]
-}
-
-variable "backend_server_ips" {
-  type    = set(string)
-  default = [
-    "10.1.0.1",
-    "10.1.0.2",
-  ]
-}
-
 resource "boundary_scope" "global" {
   global_scope = true
   description  = "My first global scope!"
@@ -144,7 +108,7 @@ resource "boundary_target" "backend_servers_service" {
   default_port = "8080"
 
   host_set_ids = [
-    boundary_host_set.backend_servers_ssh .id
+    boundary_host_set.backend_servers_ssh.id
   ]
 }
 
