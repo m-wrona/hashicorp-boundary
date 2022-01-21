@@ -14,20 +14,17 @@ resource "boundary_auth_method" "password" {
 }
 
 resource "boundary_role" "organization_readonly" {
-  name          = "Read-only"
-  description   = "Read-only role"
+  name          = "Org read-only"
+  description   = "Read-only role for the whole organisation"
   principal_ids = [boundary_group.readonly.id]
   grant_strings = ["id=*;type=*;actions=read;output_fields=*"]
   scope_id      = boundary_scope.bms.id
 }
 
 resource "boundary_role" "organization_admin" {
-  name        = "admin"
-  description = "Administrator role"
-  principal_ids = concat(
-    [for user in boundary_user.admin_users : user.id],
-    ["u_auth"]
-  )
+  name        = "Org admin"
+  description = "Administrator role for the whole organisation"
+  principal_ids = [boundary_group.admins.id]
   grant_strings  = ["id=*;type=*;actions=*;output_fields=*"]
   scope_id       = "global"
   grant_scope_id = boundary_scope.bms.id
