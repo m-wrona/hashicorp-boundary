@@ -15,8 +15,8 @@ resource "boundary_role" "core_infra_readonly" {
 }
 
 resource "boundary_role" "core_infa_admin" {
-  name        = "core-infra admin"
-  description = "Administrator role for core-infra"
+  name          = "core-infra admin"
+  description   = "Administrator role for core-infra"
   principal_ids = [boundary_group.admins.id]
   grant_strings = ["id=*;type=*;actions=*;output_fields=*"]
   scope_id      = boundary_scope.bms_core_infra.id

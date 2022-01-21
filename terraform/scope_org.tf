@@ -22,9 +22,9 @@ resource "boundary_role" "organization_readonly" {
 }
 
 resource "boundary_role" "organization_admin" {
-  name        = "Org admin"
-  description = "Administrator role for the whole organisation"
-  principal_ids = [boundary_group.admins.id]
+  name           = "Org admin"
+  description    = "Administrator role for the whole organisation"
+  principal_ids  = [boundary_group.admins.id]
   grant_strings  = ["id=*;type=*;actions=*;output_fields=*"]
   scope_id       = "global"
   grant_scope_id = boundary_scope.bms.id
