@@ -78,7 +78,7 @@ resource "boundary_role" "organization_readonly" {
   name          = "Read-only"
   description   = "Read-only role"
   principal_ids = [boundary_group.readonly.id]
-  grant_strings = ["id=*;type=*;actions=read"]
+  grant_strings = ["id=*;type=*;actions=read;output_fields=*"]
   scope_id      = boundary_scope.corp.id
 }
 
@@ -88,13 +88,14 @@ resource "boundary_role" "organization_admin" {
   principal_ids = concat(
     [for user in boundary_user.admin_users : user.id]
   )
-  grant_strings = ["id=*;type=*;actions=create,read,update,delete"]
+  grant_strings = ["id=*;type=*;actions=*;output_fields=*"]
   scope_id      = boundary_scope.corp.id
 }
 
 resource "boundary_scope" "core_infra" {
-  name                   = "core_infra"
-  description            = "Project for core part of infrastructure"
-  scope_id               = boundary_scope.corp.id
-  auto_create_admin_role = true
+  name                     = "core_infra"
+  description              = "Project for core part of infrastructure"
+  scope_id                 = boundary_scope.corp.id
+  auto_create_admin_role   = true
+  auto_create_default_role = true
 }
