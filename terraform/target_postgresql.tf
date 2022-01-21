@@ -35,3 +35,15 @@ resource "boundary_target" "postgres" {
     boundary_host_set.postgres.id
   ]
 }
+
+resource "boundary_target" "postgres_ssh" {
+  type                     = "tcp"
+  name                     = "postgres-ssh"
+  description              = "SSH access to Postgres server"
+  scope_id                 = boundary_scope.bms_core_infra.id
+  default_port = "22"
+
+  host_set_ids = [
+    boundary_host_set.postgres.id
+  ]
+}

@@ -28,7 +28,7 @@ resource "boundary_target" "nginx" {
   name         = "nginx"
   description  = "HTTP access to nginx server"
   scope_id     = boundary_scope.bms_core_infra.id
-  default_port = "8080"
+  default_port = "80"
 
   host_set_ids = [
     boundary_host_set.nginx.id
