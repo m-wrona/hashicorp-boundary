@@ -2,7 +2,7 @@ resource "boundary_host_catalog" "postgres" {
   name        = "postgres"
   description = "Postgres databases running on docker"
   type        = "static"
-  scope_id    = boundary_scope.core_infra.id
+  scope_id    = boundary_scope.bms_core_infra.id
 }
 
 resource "boundary_host" "postgres" {
@@ -27,11 +27,11 @@ resource "boundary_target" "postgres" {
   type                     = "tcp"
   name                     = "postgres"
   description              = "Postgres server running on docker"
-  scope_id                 = boundary_scope.core_infra.id
+  scope_id                 = boundary_scope.bms_core_infra.id
   session_connection_limit = -1
   session_max_seconds      = 2
   default_port             = 5432
-  host_source_ids = [
+  host_set_ids = [
     boundary_host_set.postgres.id
   ]
 }

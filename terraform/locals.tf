@@ -1,11 +1,13 @@
 locals {
   admin_users = [
-    "m-wrona",
+    "bms",
     "Mike",
+    "m-wrona",
   ]
 
   readonly_users = [
-    "Tom",
-    "Jerry",
+    "bms-readonly",
+    "Mike-readonly",
+    "m-wrona-readonly",
   ]
 }
