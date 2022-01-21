@@ -5,21 +5,21 @@ resource "boundary_host_catalog" "postgres" {
   scope_id    = boundary_scope.bms_core_infra.id
 }
 
-resource "boundary_host" "postgres" {
+resource "boundary_host" "postgres_1" {
   type            = "static"
-  name            = "postgres"
+  name            = "postgres - instance 1"
   description     = "Postgres instance"
-  address         = "localhost"
+  address         = "postgres"
   host_catalog_id = boundary_host_catalog.postgres.id
 }
 
 resource "boundary_host_set" "postgres" {
   type            = "static"
-  name            = "Postgres machines"
+  name            = "Postgres cluster"
   description     = "CLI access to postgres server"
   host_catalog_id = boundary_host_catalog.postgres.id
   host_ids = [
-    boundary_host.postgres.id
+    boundary_host.postgres_1.id
   ]
 }
 
@@ -42,6 +42,9 @@ resource "boundary_target" "postgres_ssh" {
   description  = "SSH access to Postgres server"
   scope_id     = boundary_scope.bms_core_infra.id
   default_port = "22"
+
+  session_connection_limit = -1
+  session_max_seconds      = 2
 
   host_set_ids = [
     boundary_host_set.postgres.id

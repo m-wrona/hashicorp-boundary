@@ -68,6 +68,52 @@ docker exec -it ${docker_postgresql_id} /bin/bash -c  "psql -U admin -d postgres
 docker exec -it ${docker_postgresql_id} /bin/bash -c "cat /var/lib/postgresql/data/pg_hba.conf"
 ```
 
+#### Login to target system via boundary
+
+1) Login as admin
+
+```sh
+/boundary_admin_login.sh
+```
+
+2) Check auth-method-ids for org
+
+```sh
+boundary auth-methods list -recursive
+```
+
+3) Login to org as admin
+
+```sh
+boundary authenticate password --auth-method-id=ampw_jTTFgLyHG3 --login-name=bms -password=password
+```
+
+4) Check ID of scope `core_infra` for which target systems are defined
+
+```sh
+boundary scopes list -recursive
+```
+
+5) List available target systems for a scope
+
+```sh
+boundary targets list -scope-id=p_QLeGM4fxVt
+```
+
+6) Login to target system 
+
+a) Make a HTTP request to Nginx
+
+```sh
+boundary connect -target-id ttcp_p0xw32kiiA --listen-port 8888 -exec curl -- localhost:8888
+```
+
+b) connect to Postgres database (db: bms, password: pass)
+
+```sh
+boundary connect -target-id ttcp_xziBUbWQsN --listen-port 5532 -exec psql -- -U bms_admin -d bms -p 5532 -h localhost
+```
+
 ## Boundary - installing locally using brew
 
 0) Install
