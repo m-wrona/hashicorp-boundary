@@ -21,10 +21,11 @@ make local-docker
 make local-docker-stop
 ```
 
-3) Run terraform 
+3) Run terraform to create boundary resources
 
 ```sh 
-./terraform.sh
+cd terraform
+terraform apply
 ```
 
 4) Clean boundary
@@ -38,8 +39,7 @@ make local-docker-down
 1) Check admin password
 
 ```sh
-docker logs ${hashicorp-boundary_boundary-db-init_container_id} | grep Password
-docker logs ${hashicorp-boundary_boundary-db-init_container_id} | grep "Auth Method ID"
+./boundary_printh.sh
 ```
 
 2) Login via UI
@@ -92,3 +92,4 @@ boundary authenticate password -auth-method-id=ampw_1234567890 -login-name=admin
 * [Boundary - basic admin](https://learn.hashicorp.com/tutorials/boundary/manage-intro?in=boundary/basic-administration)
 * [Boundary - sample deployments](https://github.com/hashicorp/boundary-reference-architecture)
 * [Sample plugin for AWS EC2](https://github.com/hashicorp/boundary-plugin-host-aws)
+* [Boundary provider for Terraform](https://registry.terraform.io/providers/hashicorp/boundary/1.0.5/docs)

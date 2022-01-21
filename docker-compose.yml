@@ -29,6 +29,9 @@ services:
       - "init"
       - "-config"
       - "/boundary/config.hcl"
+      - "-skip-scopes-creation"
+      - "-skip-target-creation"
+      - "-skip-host-resources-creation"
     environment:
       - BOUNDARY_POSTGRES_URL=postgresql://boundary_admin:pass@postgres:5432/boundary?sslmode=disable
     depends_on:
@@ -70,12 +73,3 @@ services:
     environment:
       - NGINX_HOST=foobar.com
       - NGINX_PORT=80
-
-  wait:
-    image: dadarek/wait-for-dependencies
-    depends_on:
-      postgres:
-          condition: service_healthy
-      boundary:
-        condition: service_healthy
-    command: postgres:5432 boundary:9200

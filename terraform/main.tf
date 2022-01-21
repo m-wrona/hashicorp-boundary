@@ -19,28 +19,52 @@ resource "boundary_auth_method" "password" {
   type     = "password"
 }
 
-resource "boundary_account" "users_acct" {
-  for_each       = var.users
-  name           = each.key
-  description    = "User account for ${each.key}"
+resource "boundary_account" "admin_users_acct" {
+  count          = length(local.admin_users)
+  name           = local.admin_users[count.index]
+  description    = "User account for ${local.admin_users[count.index]}"
   type           = "password"
-  login_name     = lower(each.key)
+  login_name     = lower(local.admin_users[count.index])
   password       = "password"
   auth_method_id = boundary_auth_method.password.id
 }
 
-resource "boundary_user" "users" {
-  for_each    = var.users
-  name        = each.key
-  description = "User resource for ${each.key}"
+resource "boundary_user" "admin_users" {
+  count       = length(local.admin_users)
+  name        = local.admin_users[count.index]
+  description = "User ${local.admin_users[count.index]}"
   scope_id    = boundary_scope.corp.id
+  account_ids = [
+    boundary_account.admin_users_acct[count.index].id
+  ]
+
+  depends_on = [
+    boundary_account.admin_users_acct
+  ]
+}
+
+resource "boundary_account" "readonly_users_acct" {
+  count          = length(local.readonly_users)
+  name           = local.readonly_users[count.index]
+  description    = "User account for ${local.readonly_users[count.index]}"
+  type           = "password"
+  login_name     = lower(local.readonly_users[count.index])
+  password       = "password"
+  auth_method_id = boundary_auth_method.password.id
 }
 
 resource "boundary_user" "readonly_users" {
-  for_each    = var.readonly_users
-  name        = each.key
-  description = "User resource for ${each.key}"
+  count       = length(local.readonly_users)
+  name        = local.readonly_users[count.index]
+  description = "User ${local.readonly_users[count.index]}"
   scope_id    = boundary_scope.corp.id
+  account_ids = [
+    boundary_account.readonly_users_acct[count.index].id
+  ]
+
+  depends_on = [
+    boundary_account.readonly_users_acct
+  ]
 }
 
 resource "boundary_group" "readonly" {
@@ -51,21 +75,21 @@ resource "boundary_group" "readonly" {
 }
 
 resource "boundary_role" "organization_readonly" {
-  name        = "Read-only"
-  description = "Read-only role"
+  name          = "Read-only"
+  description   = "Read-only role"
   principal_ids = [boundary_group.readonly.id]
   grant_strings = ["id=*;type=*;actions=read"]
-  scope_id    = boundary_scope.corp.id
+  scope_id      = boundary_scope.corp.id
 }
 
 resource "boundary_role" "organization_admin" {
   name        = "admin"
   description = "Administrator role"
   principal_ids = concat(
-    [for user in boundary_user.users: user.id]
+    [for user in boundary_user.admin_users : user.id]
   )
-  grant_strings   = ["id=*;type=*;actions=create,read,update,delete"]
-  scope_id = boundary_scope.corp.id
+  grant_strings = ["id=*;type=*;actions=create,read,update,delete"]
+  scope_id      = boundary_scope.corp.id
 }
 
 resource "boundary_scope" "core_infra" {
